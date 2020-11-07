@@ -4,7 +4,6 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
 
-  /* width: 100vw; */
   height: 100vh;
   position: relative;
 `;
@@ -23,7 +22,7 @@ export const Content = styled.section`
 
 export const Form = styled.form`
   &.top-screen {
-    margin-top: 5px;
+    margin-top: 15px;
   }
 
   .MuiButton-containedPrimary {
@@ -40,10 +39,12 @@ export const Form = styled.form`
 
 export const YoutubeContent = styled.div`
   @media (min-width: 1100px) {
-    display: grid;
+    .infinite-scroll-component {
+      display: grid;
 
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: 20px;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-gap: 20px;
+    }
   }
 `;
 
@@ -53,10 +54,14 @@ export const YoutubeCard = styled.div`
 
   margin-bottom: 20px;
 
-  img {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  > img {
     margin: 20px 0;
-    width: 100%;
-    height: 70%;
+    width: 352px;
+    height: 242px;
   }
 `;
 

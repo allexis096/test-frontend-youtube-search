@@ -1,7 +1,8 @@
 import React, { FormEvent, useCallback, useState } from 'react';
 import { Button, TextField } from '@material-ui/core';
-
 import { Link } from 'react-router-dom';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
 import {
   Container,
   Content,
@@ -14,7 +15,22 @@ import logoImg from '../../assets/dark-logo.svg';
 import api from '../../services/api';
 import key from '../../utils/key';
 
+interface YoutubeProps {
+  etag: string;
+  snippet: {
+    title: string;
+    channelTitle: string;
+    description: string;
+    thumbnails: {
+      medium: {
+        url: string;
+      };
+    };
+  };
+}
+
 const Dashboard: React.FC = () => {
+  const [videos, setVideos] = useState<YoutubeProps[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isActive, setIsActive] = useState(false);
 
@@ -22,16 +38,24 @@ const Dashboard: React.FC = () => {
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
+      const response = await api.get(
+        `search?part=id,snippet&q=${inputValue}&maxResults=6&order=viewCount&pageToken=CAoQAA&key=${key.key2}`,
+      );
+
       setIsActive(true);
 
-      // const response = await api.get(
-      //   `search?part=id,snippet&q=${inputValue}&key=${key.key}`,
-      // );
-
-      // console.log(response.data);
+      setVideos(response.data.items);
     },
-    [],
+    [inputValue],
   );
+
+  const fetchMoreVideos = useCallback(async () => {
+    const response = await api.get(
+      `search?part=id,snippet&q=${inputValue}&maxResults=6&order=viewCount&pageToken=CBAQAA&key=${key.key2}`,
+    );
+
+    setVideos(prev => [...prev, ...response.data.items]);
+  }, [inputValue]);
 
   return (
     <Container>
@@ -55,101 +79,29 @@ const Dashboard: React.FC = () => {
         </Form>
 
         <YoutubeContent>
-          <YoutubeCard>
-            <img src={logoImg} alt="thumbnail" />
-            <Info>
-              <h2>My name is Barry Allen</h2>
-              <span>The Flash</span>
-              <p>
-                My name is Barry Allen and Im the fastest man alive. When I was
-                a child, I saw my mother killed by something impossible. My
-                father went to prison for her murder. Then an accident made me
-                the impossible.
-              </p>
+          <InfiniteScroll
+            dataLength={videos.length}
+            next={fetchMoreVideos}
+            hasMore
+            loader={isActive ? <h2>Loading... </h2> : ''}
+          >
+            {videos &&
+              videos.map(video => (
+                <YoutubeCard key={video.etag}>
+                  <img
+                    src={video.snippet.thumbnails.medium.url}
+                    alt="thumbnail"
+                  />
+                  <Info>
+                    <h2>{video.snippet.title}</h2>
+                    <span>{video.snippet.channelTitle}</span>
+                    <p>{video.snippet.description}</p>
 
-              <Link to="/">Detalhes do vídeo</Link>
-            </Info>
-          </YoutubeCard>
-
-          <YoutubeCard>
-            <img src={logoImg} alt="thumbnail" />
-            <Info>
-              <h2>My name is Barry Allen</h2>
-              <span>The Flash</span>
-              <p>
-                My name is Barry Allen and Im the fastest man alive. When I was
-                a child, I saw my mother killed by something impossible. My
-                father went to prison for her murder. Then an accident made me
-                the impossible.
-              </p>
-
-              <Link to="/">Detalhes do vídeo</Link>
-            </Info>
-          </YoutubeCard>
-
-          <YoutubeCard>
-            <img src={logoImg} alt="thumbnail" />
-            <Info>
-              <h2>My name is Barry Allen</h2>
-              <span>The Flash</span>
-              <p>
-                My name is Barry Allen and Im the fastest man alive. When I was
-                a child, I saw my mother killed by something impossible. My
-                father went to prison for her murder. Then an accident made me
-                the impossible.
-              </p>
-
-              <Link to="/">Detalhes do vídeo</Link>
-            </Info>
-          </YoutubeCard>
-
-          <YoutubeCard>
-            <img src={logoImg} alt="thumbnail" />
-            <Info>
-              <h2>My name is Barry Allen</h2>
-              <span>The Flash</span>
-              <p>
-                My name is Barry Allen and Im the fastest man alive. When I was
-                a child, I saw my mother killed by something impossible. My
-                father went to prison for her murder. Then an accident made me
-                the impossible.
-              </p>
-
-              <Link to="/">Detalhes do vídeo</Link>
-            </Info>
-          </YoutubeCard>
-
-          <YoutubeCard>
-            <img src={logoImg} alt="thumbnail" />
-            <Info>
-              <h2>My name is Barry Allen</h2>
-              <span>The Flash</span>
-              <p>
-                My name is Barry Allen and Im the fastest man alive. When I was
-                a child, I saw my mother killed by something impossible. My
-                father went to prison for her murder. Then an accident made me
-                the impossible.
-              </p>
-
-              <Link to="/">Detalhes do vídeo</Link>
-            </Info>
-          </YoutubeCard>
-
-          <YoutubeCard>
-            <img src={logoImg} alt="thumbnail" />
-            <Info>
-              <h2>My name is Barry Allen</h2>
-              <span>The Flash</span>
-              <p>
-                My name is Barry Allen and Im the fastest man alive. When I was
-                a child, I saw my mother killed by something impossible. My
-                father went to prison for her murder. Then an accident made me
-                the impossible.
-              </p>
-
-              <Link to="/">Detalhes do vídeo</Link>
-            </Info>
-          </YoutubeCard>
+                    <Link to="/">Detalhes do vídeo</Link>
+                  </Info>
+                </YoutubeCard>
+              ))}
+          </InfiniteScroll>
         </YoutubeContent>
       </Content>
     </Container>
