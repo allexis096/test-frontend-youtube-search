@@ -14,23 +14,10 @@ import {
 import logoImg from '../../assets/dark-logo.svg';
 import api from '../../services/api';
 import key from '../../utils/key';
-
-interface YoutubeProps {
-  etag: string;
-  snippet: {
-    title: string;
-    channelTitle: string;
-    description: string;
-    thumbnails: {
-      medium: {
-        url: string;
-      };
-    };
-  };
-}
+import { useVideo } from '../../hooks/video';
 
 const Dashboard: React.FC = () => {
-  const [videos, setVideos] = useState<YoutubeProps[]>([]);
+  const { videos, setVideos } = useVideo();
   const [inputValue, setInputValue] = useState('');
   const [isActive, setIsActive] = useState(false);
 
@@ -46,7 +33,7 @@ const Dashboard: React.FC = () => {
 
       setVideos(response.data.items);
     },
-    [inputValue],
+    [inputValue, setVideos],
   );
 
   const fetchMoreVideos = useCallback(async () => {
@@ -55,7 +42,7 @@ const Dashboard: React.FC = () => {
     );
 
     setVideos(prev => [...prev, ...response.data.items]);
-  }, [inputValue]);
+  }, [inputValue, setVideos]);
 
   return (
     <Container>
@@ -97,7 +84,9 @@ const Dashboard: React.FC = () => {
                     <span>{video.snippet.channelTitle}</span>
                     <p>{video.snippet.description}</p>
 
-                    <Link to="/">Detalhes do vídeo</Link>
+                    <Link to={`/video/${video.id.videoId}`}>
+                      Detalhes do vídeo
+                    </Link>
                   </Info>
                 </YoutubeCard>
               ))}
