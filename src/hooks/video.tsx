@@ -26,15 +26,19 @@ interface YoutubeProps {
 interface VideoContextProps {
   videos: YoutubeProps[];
   setVideos: Dispatch<SetStateAction<YoutubeProps[]>>;
+
+  token: string;
+  setToken: Dispatch<SetStateAction<string>>;
 }
 
 const VideoContext = createContext<VideoContextProps>({} as VideoContextProps);
 
 export const VideoProvider: React.FC = ({ children }) => {
   const [videos, setVideos] = useState<YoutubeProps[]>([]);
+  const [token, setToken] = useState('');
 
   return (
-    <VideoContext.Provider value={{ videos, setVideos }}>
+    <VideoContext.Provider value={{ videos, setVideos, token, setToken }}>
       {children}
     </VideoContext.Provider>
   );
