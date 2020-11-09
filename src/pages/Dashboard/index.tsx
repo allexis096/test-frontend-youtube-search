@@ -15,15 +15,24 @@ import logoImg from '../../assets/dark-logo.svg';
 import api from '../../services/api';
 import key from '../../utils/key';
 import { useVideo } from '../../hooks/video';
+import Error from '../../components/Error';
 
 const Dashboard: React.FC = () => {
-  const { videos, setVideos } = useVideo();
+  const { videos, setVideos, token, setToken } = useVideo();
+
   const [inputValue, setInputValue] = useState('');
+  const [error, setError] = useState(false);
   const [isActive, setIsActive] = useState(false);
 
   const handleSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+
+      if (inputValue === '') {
+        setError(true);
+        return;
+      }
+      setError(false);
 
       const response = await api.get(
         `search?part=id,snippet&q=${inputValue}&maxResults=6&order=viewCount&pageToken=CAoQAA&key=${key.key2}`,
@@ -31,27 +40,27 @@ const Dashboard: React.FC = () => {
 
       setIsActive(true);
 
+      setToken(response.data.nextPageToken);
+
       setVideos(response.data.items);
     },
-    [inputValue, setVideos],
+    [inputValue, setVideos, setToken],
   );
 
   const fetchMoreVideos = useCallback(async () => {
     const response = await api.get(
-      `search?part=id,snippet&q=${inputValue}&maxResults=6&order=viewCount&pageToken=CBAQAA&key=${key.key2}`,
+      `search?part=id,snippet&q=${inputValue}&maxResults=6&order=viewCount&pageToken=${token}&key=${key.key2}`,
     );
 
+    setToken(response.data.nextPageToken);
+
     setVideos(prev => [...prev, ...response.data.items]);
-  }, [inputValue, setVideos]);
+  }, [inputValue, token, setVideos, setToken]);
 
   return (
     <Container>
       <Content>
-        <img
-          src={logoImg}
-          alt="Logo"
-          style={isActive ? { display: 'none' } : { display: 'inherit' }}
-        />
+        <img src={logoImg} alt="Logo" />
         <Form onSubmit={handleSubmit} className={isActive ? 'top-screen' : ''}>
           <TextField
             value={inputValue}
@@ -66,6 +75,12 @@ const Dashboard: React.FC = () => {
         </Form>
 
         <YoutubeContent>
+          {error && (
+            <Error
+              messageDescription="Não encontramos vídeos com o termo buscado."
+              messageBack="Utilize outras palavras-chave."
+            />
+          )}
           <InfiniteScroll
             dataLength={videos.length}
             next={fetchMoreVideos}
@@ -74,7 +89,9 @@ const Dashboard: React.FC = () => {
           >
             {videos &&
               videos.map(video => (
-                <YoutubeCard key={video.etag}>
+                <YoutubeCard
+                  key={video.id.videoId || video.snippet.thumbnails.medium.url}
+                >
                   <img
                     src={video.snippet.thumbnails.medium.url}
                     alt="thumbnail"
