@@ -1,48 +1,126 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ArrowBack,
   ThumbUpAlt,
   ThumbDown,
   Visibility,
 } from '@material-ui/icons';
-import logoImg from '../../assets/dark-logo.svg';
+import { Link, useRouteMatch } from 'react-router-dom';
 
-import { YoutubeVideo, Title, Info, Likes, Description } from './styles';
+import {
+  OnError,
+  YoutubeVideo,
+  Title,
+  Info,
+  Likes,
+  Description,
+} from './styles';
+import api from '../../services/api';
+import key from '../../utils/key';
+import Error from '../../components/Error';
+
+interface VideoProps {
+  snippet: {
+    title: string;
+    channelTitle: string;
+    description: string;
+    thumbnails: {
+      high: {
+        url: string;
+      };
+    };
+  };
+  statistics: {
+    dislikeCount: string;
+    likeCount: string;
+    viewCount: string;
+  };
+}
+
+interface VideoParams {
+  video: string;
+}
 
 const Video: React.FC = () => {
-  return (
-    <YoutubeVideo>
-      <Title>
-        <ArrowBack />
-        <h2>Titulo do video 1</h2>
-      </Title>
-      <img src={logoImg} alt="thumbnail" />
-      <Info>
-        <span>Nome do canal</span>
-        <Likes>
-          <div>
-            <ThumbUpAlt />
-            <span>123</span>
-          </div>
+  const { params } = useRouteMatch<VideoParams>();
 
-          <div>
-            <ThumbDown />
-            <span>234</span>
-          </div>
-        </Likes>
-      </Info>
-      <Description>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
-          aliquet ipsum et nisl ultricies tincidunt. Nam malesuada diam quis dui
-          bibendum, ut molestie sapien ullamcorper. Aliquam imperdiet tellus
-          auctor nunc volutpat aliquet. Nulla at accumsan tortor, vulputate
-          porttitor lacus. Vestibulum sit amet tortor nisl. Etiam cursus
-          suscipit dapibus.
-        </p>
-        <Visibility />
-      </Description>
-    </YoutubeVideo>
+  const [video, setVideo] = useState<VideoProps>();
+  const [errorVideo, setErrorVideo] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const response = await api.get(
+        `videos?id=${params.video}&part=snippet,statistics&key=${key.key2}`,
+      );
+
+      if (response.data.items[0] === undefined) {
+        setErrorVideo(true);
+      }
+
+      setVideo(response.data.items[0]);
+    })();
+  }, [params.video]);
+
+  // console.log(
+  //   new Intl.NumberFormat('pt-BR').format(Number(video?.statistics.viewCount)),
+  // );
+
+  return (
+    <>
+      {errorVideo && (
+        <OnError>
+          <Link to="/">
+            <ArrowBack />
+          </Link>
+          <Error
+            messageDescription="ID do vídeo não encontrado."
+            messageBack="Clique na seta à esquerda para voltar."
+          />
+        </OnError>
+      )}
+      <YoutubeVideo>
+        {video && (
+          <>
+            <Title>
+              <Link to="/">
+                <ArrowBack />
+              </Link>
+              <h2>{video.snippet.title}</h2>
+            </Title>
+            <img src={video.snippet.thumbnails.high.url} alt="thumbnail" />
+            <Info>
+              <span>{video.snippet.channelTitle}</span>
+              <Likes>
+                <div>
+                  <ThumbUpAlt style={{ color: '#2D88FF' }} />
+                  {new Intl.NumberFormat('pt-BR').format(
+                    Number(video.statistics.likeCount),
+                  )}
+                </div>
+
+                <div>
+                  <ThumbDown style={{ color: '#ff0000' }} />
+                  {new Intl.NumberFormat('pt-BR').format(
+                    Number(video.statistics.dislikeCount),
+                  )}
+                </div>
+              </Likes>
+            </Info>
+            <Description>
+              <pre>{video.snippet.description}</pre>
+              <div>
+                <Visibility />
+                <span>
+                  {new Intl.NumberFormat('pt-BR').format(
+                    Number(video.statistics.viewCount),
+                  )}
+                </span>
+              </div>
+            </Description>
+          </>
+        )}
+      </YoutubeVideo>
+    </>
   );
 };
 
