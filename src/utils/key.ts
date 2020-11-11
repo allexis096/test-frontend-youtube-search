@@ -1,3 +1,3 @@
 export default {
-  key: 'AIzaSyAPv-fdi4hoy7FjL5HpqJMChRtT8ooGLZs',
+  key: 'AIzaSyBdNoC9dwNC6_-hnFq_31vUrgi13-gpdow',
 };
