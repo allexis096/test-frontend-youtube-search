@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { animationFromLeft, animationFromRight } from '../../utils/animations';
 
 export const OnError = styled.div`
   height: 100vh;
@@ -21,7 +22,8 @@ export const YoutubeVideo = styled.div`
   max-width: 382px;
   margin: 0 auto;
 
-  > img {
+  > iframe {
+    animation: ${animationFromRight} 1.5s;
     margin: 20px 0;
     width: 382px;
     height: 272px;
@@ -30,7 +32,7 @@ export const YoutubeVideo = styled.div`
   @media (min-width: 1100px) {
     max-width: 702px;
 
-    > img {
+    > iframe {
       width: 702px;
       height: 472px;
     }
@@ -41,6 +43,7 @@ export const Title = styled.header`
   display: flex;
 
   a {
+    animation: ${animationFromLeft} 1.5s;
     text-decoration: none;
     color: #ff0000;
     position: absolute;
@@ -53,11 +56,13 @@ export const Title = styled.header`
   }
 
   h2 {
+    animation: ${animationFromLeft} 1.5s;
     margin-top: 15px;
   }
 `;
 
 export const Info = styled.section`
+  animation: ${animationFromLeft} 1.5s;
   display: flex;
   justify-content: space-between;
   width: 95%;
@@ -88,11 +93,16 @@ export const Description = styled.main`
   margin-top: 20px;
 
   pre {
+    animation: ${animationFromRight} 1.5s;
     overflow: hidden;
     text-overflow: ellipsis;
+    background-color: #ebf5ee;
+    border-radius: 5px;
+    padding: 5px;
   }
 
   div {
+    animation: ${animationFromLeft} 1.5s;
     margin-top: 20px;
     display: flex;
     align-items: center;
@@ -100,8 +110,5 @@ export const Description = styled.main`
     svg {
       margin-right: 10px;
     }
-  }
-
-  @media (min-width: 1100px) {
   }
 `;

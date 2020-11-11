@@ -20,6 +20,7 @@ import key from '../../utils/key';
 import Error from '../../components/Error';
 
 interface VideoProps {
+  id: string;
   snippet: {
     title: string;
     channelTitle: string;
@@ -50,7 +51,7 @@ const Video: React.FC = () => {
   useEffect(() => {
     (async () => {
       const response = await api.get(
-        `videos?id=${params.video}&part=snippet,statistics&key=${key.key2}`,
+        `videos?id=${params.video}&part=snippet,statistics&key=${key.key}`,
       );
 
       if (response.data.items[0] === undefined) {
@@ -60,10 +61,6 @@ const Video: React.FC = () => {
       setVideo(response.data.items[0]);
     })();
   }, [params.video]);
-
-  // console.log(
-  //   new Intl.NumberFormat('pt-BR').format(Number(video?.statistics.viewCount)),
-  // );
 
   return (
     <>
@@ -87,7 +84,13 @@ const Video: React.FC = () => {
               </Link>
               <h2>{video.snippet.title}</h2>
             </Title>
-            <img src={video.snippet.thumbnails.high.url} alt="thumbnail" />
+            <iframe
+              title="youtube"
+              src={`https://www.youtube.com/embed/${video.id}`}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
             <Info>
               <span>{video.snippet.channelTitle}</span>
               <Likes>
