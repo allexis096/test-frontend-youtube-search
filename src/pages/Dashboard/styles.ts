@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { animationFromTop } from '../../utils/animations';
 
 export const Container = styled.div`
   display: flex;
@@ -14,13 +15,17 @@ export const Content = styled.section`
   align-items: center;
   margin: auto auto;
 
-  img {
+  > img {
+    animation: ${animationFromTop} 1.5s;
+
     width: 100px;
     height: 100px;
   }
 `;
 
 export const Form = styled.form`
+  animation: ${animationFromTop} 1.5s;
+
   &.top-screen {
     margin-top: 15px;
   }
@@ -38,6 +43,8 @@ export const Form = styled.form`
 `;
 
 export const YoutubeContent = styled.div`
+  animation: ${animationFromTop} 1.5s;
+
   @media (min-width: 1100px) {
     .infinite-scroll-component {
       display: grid;
@@ -49,10 +56,12 @@ export const YoutubeContent = styled.div`
 `;
 
 export const YoutubeCard = styled.div`
-  padding: 0 20px;
+  padding: 0 20px 20px;
   max-width: 400px;
+  border-radius: 5px;
+  background-color: #ebf5ee;
 
-  margin-bottom: 20px;
+  margin: 20px 0;
 
   display: flex;
   flex-direction: column;

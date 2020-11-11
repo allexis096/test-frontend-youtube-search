@@ -16,13 +16,15 @@ import api from '../../services/api';
 import key from '../../utils/key';
 import { useVideo } from '../../hooks/video';
 import Error from '../../components/Error';
+import Spinner from '../../components/Spinner';
 
 const Dashboard: React.FC = () => {
   const { videos, setVideos, token, setToken } = useVideo();
 
-  const [inputValue, setInputValue] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
   const handleSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -30,12 +32,14 @@ const Dashboard: React.FC = () => {
 
       if (inputValue === '') {
         setError(true);
+        setVideos([]);
         return;
       }
       setError(false);
+      setLoading(true);
 
       const response = await api.get(
-        `search?part=id,snippet&q=${inputValue}&maxResults=6&order=viewCount&pageToken=CAoQAA&key=${key.key2}`,
+        `search?part=id,snippet&q=${inputValue}&maxResults=6&order=viewCount&pageToken=CAoQAA&key=${key.key}`,
       );
 
       setIsActive(true);
@@ -43,13 +47,15 @@ const Dashboard: React.FC = () => {
       setToken(response.data.nextPageToken);
 
       setVideos(response.data.items);
+
+      setLoading(false);
     },
     [inputValue, setVideos, setToken],
   );
 
   const fetchMoreVideos = useCallback(async () => {
     const response = await api.get(
-      `search?part=id,snippet&q=${inputValue}&maxResults=6&order=viewCount&pageToken=${token}&key=${key.key2}`,
+      `search?part=id,snippet&q=${inputValue}&maxResults=6&order=viewCount&pageToken=${token}&key=${key.key}`,
     );
 
     setToken(response.data.nextPageToken);
@@ -70,7 +76,7 @@ const Dashboard: React.FC = () => {
             onChange={e => setInputValue(e.target.value)}
           />
           <Button type="submit" variant="contained" color="primary">
-            Buscar
+            {loading ? <Spinner /> : 'Buscar'}
           </Button>
         </Form>
 
@@ -85,7 +91,7 @@ const Dashboard: React.FC = () => {
             dataLength={videos.length}
             next={fetchMoreVideos}
             hasMore
-            loader={isActive ? <h2>Loading... </h2> : ''}
+            loader=""
           >
             {videos &&
               videos.map(video => (
