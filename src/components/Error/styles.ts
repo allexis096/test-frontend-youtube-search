@@ -1,6 +1,9 @@
 import styled from 'styled-components';
+import { animationFromBottom } from '../../utils/animations';
 
 export const Container = styled.div`
+  animation: ${animationFromBottom} 1.5s;
+
   text-align: center;
 
   p {
