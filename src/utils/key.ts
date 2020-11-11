@@ -1,3 +1,4 @@
 export default {
-  key: 'AIzaSyBdNoC9dwNC6_-hnFq_31vUrgi13-gpdow',
+  // put your key here
+  key: '',
 };
