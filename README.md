@@ -65,7 +65,7 @@ $ yarn
 
 ## ❗ Important thing before run the project
 
-Go to page <strong>utils</strong> and edit the file <strong>key.ts</strong>.
+Go to folder <strong>utils</strong> and edit the file <strong>key.ts</strong>.
 You can get the API key in this [Google Site for developers](https://developers.google.com/youtube/v3/getting-started?hl=pt-br).
 
 <img alt="key response" src="https://imgur.com/bru9nJo.png">
